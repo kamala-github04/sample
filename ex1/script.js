@@ -1,4 +1,13 @@
-document.getElementById('contact-form').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent actual form submission for demonstration
-    alert('Thank you for your message! I will get back to you soon.');
+// Smooth scrolling to sections
+document.querySelectorAll('nav ul li a').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const targetSection = document.querySelector(this.getAttribute('href'));
+        targetSection.scrollIntoView({
+            behavior: 'smooth'
+        });
+    });
 });
+
+// Optional: Add more JavaScript functionality here, if needed
