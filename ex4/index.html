@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Delivery</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Welcome to Food Delivery</h1>
+        <h2>Order from Your Favorite Restaurant</h2>
+    </header>
+    
+    <section>
+        <h3>Select a Restaurant</h3>
+        <form id="restaurantForm">
+            <label for="restaurant">Restaurant:</label>
+            <select id="restaurant" name="restaurant" required>
+                <!-- Restaurants will be loaded dynamically -->
+            </select>
+
+            <label for="foodItem">Select Food Item:</label>
+            <select id="foodItem" name="foodItem" required>
+                <option value="">Select a restaurant first</option>
+            </select>
+
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" name="quantity" value="1" min="1" required>
+            
+            <button type="submit">Place Order</button>
+        </form>
+    </section>
+    
+    <script>
+        async function loadRestaurants() {
+            const response = await fetch('/restaurants');
+            const restaurants = await response.json();
+
+            const restaurantSelect = document.getElementById('restaurant');
+            restaurantSelect.innerHTML = restaurants.map(restaurant => 
+                `<option value="${restaurant.name}">${restaurant.name}</option>`
+            ).join('');
+        }
+
+        document.getElementById('restaurant').addEventListener('change', async function() {
+            const selectedRestaurant = this.value;
+            const response = await fetch(`/menu/${selectedRestaurant}`);
+            const menu = await response.json();
+
+            const foodItemSelect = document.getElementById('foodItem');
+            foodItemSelect.innerHTML = menu.map(item => 
+                `<option value="${item.itemName}">${item.itemName} - $${item.price}</option>`
+            ).join('');
+        });
+
+        document.getElementById('restaurantForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const restaurant = document.getElementById('restaurant').value;
+            const foodItem = document.getElementById('foodItem').value;
+            const quantity = document.getElementById('quantity').value;
+
+            const response = await fetch('/order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ restaurant, foodItem, quantity })
+            });
+
+            if (response.ok) {
+                alert('Order placed successfully!');
+            } else {
+                alert('Failed to place order.');
+            }
+        });
+
+        // Load restaurants on page load
+        loadRestaurants();
+    </script>
+</body>
+</html>
